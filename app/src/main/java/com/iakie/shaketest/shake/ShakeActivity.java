@@ -5,6 +5,8 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.AudioManager;
+import android.media.SoundPool;
 import android.os.Bundle;
 import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
@@ -29,6 +31,8 @@ public class ShakeActivity extends AppCompatActivity implements SensorEventListe
     private Sensor sensor;
     private AnimationSet mSetUp;
     private AnimationSet mSetDown;
+    SoundPool soundPool;
+    private int loadId;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -51,6 +55,10 @@ public class ShakeActivity extends AppCompatActivity implements SensorEventListe
         sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         // 3.注册传感器对象
         sensorManager.registerListener(this,sensor,SensorManager.SENSOR_DELAY_NORMAL);
+        // 获取音效池对象
+        soundPool = new SoundPool(2, AudioManager.STREAM_MUSIC,0);
+        // 加载音效到音效池中
+        loadId = soundPool.load(this,R.raw.awe,1);
     }
 
     @Override
@@ -62,6 +70,9 @@ public class ShakeActivity extends AppCompatActivity implements SensorEventListe
         float z = values[2];
         int minValue = 12;
         if (Math.abs(x)>minValue||Math.abs(y)>minValue||Math.abs(z)>minValue) {
+            // 播放音效
+            soundPool.play(loadId,1,1,1,0,1);
+
             // 开始动画效果
             upImg.startAnimation(mSetUp);
             downImg.startAnimation(mSetDown);
