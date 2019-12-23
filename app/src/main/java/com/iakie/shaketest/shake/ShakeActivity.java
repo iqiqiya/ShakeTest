@@ -6,6 +6,9 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 
 import androidx.annotation.Nullable;
@@ -24,12 +27,15 @@ public class ShakeActivity extends AppCompatActivity implements SensorEventListe
     ImageView upImg,downImg,centerImg;
     SensorManager sensorManager;
     private Sensor sensor;
+    private AnimationSet mSetUp;
+    private AnimationSet mSetDown;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_shake);
         initView();
+        initAnimation();
     }
 
     private void initView() {
@@ -57,7 +63,8 @@ public class ShakeActivity extends AppCompatActivity implements SensorEventListe
         int minValue = 12;
         if (Math.abs(x)>minValue||Math.abs(y)>minValue||Math.abs(z)>minValue) {
             // 开始动画效果
-            
+            upImg.startAnimation(mSetUp);
+            downImg.startAnimation(mSetDown);
         }
     }
 
@@ -72,5 +79,33 @@ public class ShakeActivity extends AppCompatActivity implements SensorEventListe
         super.onDestroy();
         // 4.注销传感器对象
         sensorManager.unregisterListener(this);
+    }
+
+    //使用代码来实现补间动画
+    private void initAnimation() {
+        // 上面图片对应的动画效果
+        TranslateAnimation mAnimationUp = new TranslateAnimation(Animation.RELATIVE_TO_SELF,0,Animation.RELATIVE_TO_SELF,0,Animation.RELATIVE_TO_SELF,0,Animation.RELATIVE_TO_SELF,-1);
+        mAnimationUp.setDuration(500); //设置持续时间
+        TranslateAnimation mAnimationUpDown = new TranslateAnimation(Animation.RELATIVE_TO_SELF,0,Animation.RELATIVE_TO_SELF,0,Animation.RELATIVE_TO_SELF,-1,Animation.RELATIVE_TO_SELF,0);
+        mAnimationUpDown.setDuration(500);
+
+        // 将上下移动的动画添加到集合中
+        mSetUp = new AnimationSet(true);
+        mSetUp.addAnimation(mAnimationUp);
+        mSetUp.addAnimation(mAnimationUpDown);
+
+        // 设置动画之间执行的时差
+        mSetUp.setStartOffset(500);
+
+        // 下面图片对应的动画效果
+        TranslateAnimation mAnimationDown = new TranslateAnimation(Animation.RELATIVE_TO_SELF,0,Animation.RELATIVE_TO_SELF,0,Animation.RELATIVE_TO_SELF,0,Animation.RELATIVE_TO_SELF,1);
+        mAnimationUp.setDuration(500); //设置持续时间 毫秒
+        TranslateAnimation mAnimationDownUp = new TranslateAnimation(Animation.RELATIVE_TO_SELF,0,Animation.RELATIVE_TO_SELF,0,Animation.RELATIVE_TO_SELF,1,Animation.RELATIVE_TO_SELF,0);
+        mAnimationUpDown.setDuration(500);
+
+        mSetDown = new AnimationSet(true);
+        mSetDown.addAnimation(mAnimationDown);
+        mSetDown.addAnimation(mAnimationDownUp);
+        mSetDown.setStartOffset(500);
     }
 }
