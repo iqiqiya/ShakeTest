@@ -8,6 +8,7 @@ import android.hardware.SensorManager;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
 import android.view.animation.TranslateAnimation;
@@ -33,6 +34,7 @@ public class ShakeActivity extends AppCompatActivity implements SensorEventListe
     private AnimationSet mSetDown;
     SoundPool soundPool;
     private int loadId;
+    Vibrator vibrator;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -59,6 +61,8 @@ public class ShakeActivity extends AppCompatActivity implements SensorEventListe
         soundPool = new SoundPool(2, AudioManager.STREAM_MUSIC,0);
         // 加载音效到音效池中
         loadId = soundPool.load(this,R.raw.awe,1);
+        // 获取振动器管理者对象
+        vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
     }
 
     @Override
@@ -70,12 +74,17 @@ public class ShakeActivity extends AppCompatActivity implements SensorEventListe
         float z = values[2];
         int minValue = 12;
         if (Math.abs(x)>minValue||Math.abs(y)>minValue||Math.abs(z)>minValue) {
+            // 开始震动
+            long[]pattern = {300,500};
+            vibrator.vibrate(pattern,-1);
+
             // 播放音效
             soundPool.play(loadId,1,1,1,0,1);
 
             // 开始动画效果
             upImg.startAnimation(mSetUp);
             downImg.startAnimation(mSetDown);
+
         }
     }
 
